@@ -1,6 +1,11 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
+# other resources
+# - dotfiles: https://dotfiles.github.io/
+# - The best way to store your dotfiles: https://www.atlassian.com/git/tutorials/dotfiles
+# - How to Customize (and Colorize) Your Bash Prompt: https://www.howtogeek.com/307701/how-to-customize-and-colorize-your-bash-prompt/
+# - Linux – Show git branch in bash prompt: https://somoit.net/linux/show-git-branch-bash-prompt
 
 # If not running interactively, don't do anything
 case $- in
