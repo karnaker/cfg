@@ -6,6 +6,9 @@
 # - The best way to store your dotfiles: https://www.atlassian.com/git/tutorials/dotfiles
 # - How to Customize (and Colorize) Your Bash Prompt: https://www.howtogeek.com/307701/how-to-customize-and-colorize-your-bash-prompt/
 # - Linux – Show git branch in bash prompt: https://somoit.net/linux/show-git-branch-bash-prompt
+# - Start ssh-agent on login: https://stackoverflow.com/questions/18880024/start-ssh-agent-on-login
+# - Using ssh-agent with ssh: https://web.archive.org/web/20210506080335/https://mah.everybody.org/docs/ssh
+# - How to check if a shell is login/interactive/batch: https://unix.stackexchange.com/questions/26676/how-to-check-if-a-shell-is-login-interactive-batch
 
 # If not running interactively, don't do anything
 case $- in
@@ -61,7 +64,7 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-#show git branch: https://somoit.net/linux/show-git-branch-bash-prompt
+# show git branch: https://somoit.net/linux/show-git-branch-bash-prompt
 git_data() {
 
         if [ -d .git ]
@@ -148,3 +151,38 @@ unset __conda_setup
 # <<< conda initialize <<<
 
 alias config='/usr/bin/git --git-dir=/home/vikram/.cfg/ --work-tree=/home/vikram'
+
+# See if you've already started ssh-agent and, if it can't find it, will start
+# it up and store the settings so that they'll be usable the next time you
+# start up a shell.
+# Sources:
+# - Start ssh-agent on login: https://stackoverflow.com/questions/18880024/start-ssh-agent-on-login
+# - Using ssh-agent with ssh: https://web.archive.org/web/20210506080335/https://mah.everybody.org/docs/ssh
+# - How to check if a shell is login/interactive/batch: https://unix.stackexchange.com/questions/26676/how-to-check-if-a-shell-is-login-interactive-batch
+
+if [[ $- == *i* ]]; then
+
+    SSH_ENV="$HOME/.ssh/environment"
+
+    function start_agent {
+        echo "Initialising new SSH agent..."
+        /usr/bin/ssh-agent | sed 's/^echo/#echo/' > "${SSH_ENV}"
+        echo succeeded
+        chmod 600 "${SSH_ENV}"
+        . "${SSH_ENV}" > /dev/null
+        /usr/bin/ssh-add;
+    }
+
+    # Source SSH settings, if applicable
+
+    if [ -f "${SSH_ENV}" ]; then
+        . "${SSH_ENV}" > /dev/null
+        #ps ${SSH_AGENT_PID} doesn't work under cywgin
+        ps -ef | grep ${SSH_AGENT_PID} | grep ssh-agent$ > /dev/null || {
+            start_agent;
+        }
+    else
+        start_agent;
+    fi
+
+fi
